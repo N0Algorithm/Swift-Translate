@@ -23,8 +23,8 @@ const INITIAL_HISTORY = [
     id: 'demo-2',
     sourceLang: 'en',
     targetLang: 'fr',
-    sourceText: 'Artificial intelligence is transforming global communications.',
-    translatedText: "L'intelligence artificielle transforme les communications mondiales.",
+    sourceText: 'Modern technology is transforming global communications.',
+    translatedText: 'La technologie moderne transforme les communications mondiales.',
     timestamp: Date.now() - 7200000,
     isStarred: false
   }
@@ -41,7 +41,7 @@ function App() {
     return saved ? saved === 'dark' : true;
   });
 
-  // Translation State: Stores the current languages, input text, and AI output.
+  // Translation State: Stores the current languages, input text, and translated output.
   const [sourceLang, setSourceLang] = useState('en');
   const [targetLang, setTargetLang] = useState('es');
   const [sourceText, setSourceText] = useState('');
