@@ -46,11 +46,11 @@
   --color-outline: #64748b;
   --color-outline-variant: #cbd5e1;
 
-  /* --- Navbar Custom Colors (High Contrast in Light Mode) --- */
-  --navbar-bg: #0f172a;
-  --navbar-text: #ffffff;
-  --navbar-border: #1e293b;
-  --navbar-icon-hover: #1e293b;
+  /* --- Navbar Custom Colors (Light Mode matches Hero Section) --- */
+  --navbar-bg: rgba(250, 248, 255, 0.9);
+  --navbar-text: #0f172a;
+  --navbar-border: #cbd5e1;
+  --navbar-icon-hover: #e2e8f0;
 
   /* --- Spacing Scale (Strict 8px Grid) --- */
   --space-xs: 4px;
@@ -103,19 +103,19 @@ html.dark {
   --color-surface-container: #1e2130;
   --color-surface-container-high: #282c3f;
   --color-surface-container-highest: #333850;
-  --color-on-surface: #f8fafc;
-  --color-on-surface-variant: #cbd5e1;
+  --color-on-surface: #ffffff;
+  --color-on-surface-variant: #e2e8f0;
   --color-inverse-surface: #f8fafc;
   --color-inverse-on-surface: #0f172a;
   
-  --color-outline: #94a3b8;
-  --color-outline-variant: #475569;
+  --color-outline: #cbd5e1;
+  --color-outline-variant: #64748b;
 
   /* --- Navbar Dark Mode Colors --- */
-  --navbar-bg: rgba(22, 24, 36, 0.95);
-  --navbar-text: #f8fafc;
+  --navbar-bg: rgba(15, 17, 26, 0.95);
+  --navbar-text: #ffffff;
   --navbar-border: rgba(255, 255, 255, 0.16);
-  --navbar-icon-hover: #1e2130;
+  --navbar-icon-hover: #232635;
 
   --glass-bg: rgba(22, 24, 36, 0.9);
   --glass-bg-low: rgba(18, 20, 30, 0.95);
@@ -171,8 +171,8 @@ select option {
 }
 
 html.dark select option {
-  background-color: #1e2130;
-  color: #f8fafc;
+  background-color: #1e2233;
+  color: #ffffff;
 }
 
 /* Material Symbols Icon Font Configuration */

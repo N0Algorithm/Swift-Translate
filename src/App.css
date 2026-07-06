@@ -11,7 +11,7 @@
   overflow: hidden;
 }
 
-/* --- Top Navigation Bar (High Contrast Slate/Navy in Light Mode) --- */
+/* --- Top Navigation Bar (Light Mode matches Hero Section, Dark Mode is Elevated) --- */
 .top-navbar {
   position: fixed;
   top: 0;
@@ -42,13 +42,16 @@
   gap: 10px;
 }
 
+/* Frame logo with a subtle border and shadow so it is clearly visible in Light Mode! */
 .brand-logo {
-  width: 34px;
-  height: 34px;
-  object-fit: contain;
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
   border-radius: var(--radius-md);
-  background: transparent;
-  padding: 1px;
+  background: #ffffff;
+  padding: 2px;
+  border: 1px solid var(--color-outline-variant);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .brand-title {
@@ -70,7 +73,7 @@
 
 .top-navbar .icon-btn:hover {
   background-color: var(--navbar-icon-hover) !important;
-  color: #ffffff !important;
+  color: var(--color-primary) !important;
   opacity: 1;
 }
 
@@ -104,7 +107,7 @@
   object-fit: cover;
 }
 
-/* --- Main Workspace (Default Standard Desktop 1280px-1535px Base) --- */
+/* --- Main Workspace --- */
 .main-workspace {
   flex: 1;
   padding-top: 66px; /* 56px navbar + 10px */
@@ -151,7 +154,7 @@
   margin: 0 auto;
 }
 
-/* --- Language Bar --- */
+/* --- Language Bar (Elevated High Contrast in Dark Mode) --- */
 .workspace-section {
   flex: 1;
   display: flex;
@@ -174,6 +177,12 @@
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
+html.dark .language-bar {
+  background-color: #1e2233 !important;
+  border: 1px solid #475569 !important;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6) !important;
+}
+
 .lang-select-wrapper {
   position: relative;
   display: flex;
@@ -183,6 +192,11 @@
   border-radius: var(--radius-lg);
   padding: 2px 4px;
   transition: all 0.2s ease;
+}
+
+html.dark .lang-select-wrapper {
+  background-color: #2a3047 !important;
+  border: 1px solid #64748b !important;
 }
 
 .lang-select-wrapper:hover {
@@ -203,12 +217,20 @@
   transition: color 0.2s ease;
 }
 
+html.dark .lang-select {
+  color: #ffffff !important;
+}
+
 .select-icon {
   position: absolute;
   right: 10px;
   pointer-events: none;
   font-size: 20px !important;
   color: var(--color-on-surface-variant);
+}
+
+html.dark .select-icon {
+  color: #e2e8f0 !important;
 }
 
 .swap-btn {
@@ -226,6 +248,12 @@
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+html.dark .swap-btn {
+  background-color: #2a3047 !important;
+  border: 1px solid #64748b !important;
+  color: #ffffff !important;
+}
+
 .swap-btn:hover {
   color: var(--color-primary);
   background-color: var(--color-primary-fixed);
@@ -236,7 +264,7 @@
   transform: rotate(360deg) scale(0.9);
 }
 
-/* --- Bento Grid (Input & Output Cards) --- */
+/* --- Bento Grid (Elevated High Readability Cards in Dark Mode) --- */
 .bento-grid {
   flex: 1;
   display: grid;
@@ -269,6 +297,18 @@
   background-color: var(--color-surface-container-low);
 }
 
+html.dark .source-card {
+  background-color: #161a26 !important;
+  border: 1px solid #475569 !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
+}
+
+html.dark .target-card {
+  background-color: #1c2232 !important;
+  border: 1px solid #475569 !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
+}
+
 .card-content {
   flex: 1;
   display: flex;
@@ -278,6 +318,7 @@
   overflow: hidden;
 }
 
+/* High Contrast Pure White Text in Dark Mode */
 .source-textarea {
   flex: 1;
   font-size: 20px;
@@ -286,6 +327,10 @@
   color: var(--color-on-surface);
   min-height: 0;
   letter-spacing: -0.01em;
+}
+
+html.dark .source-textarea {
+  color: #ffffff !important;
 }
 
 .output-content {
@@ -301,12 +346,21 @@
   letter-spacing: -0.01em;
 }
 
+html.dark .output-content {
+  color: #ffffff !important;
+}
+
 .output-placeholder {
   font-size: 20px;
   line-height: 30px;
   font-weight: 500;
   color: var(--color-outline);
   opacity: 0.75;
+}
+
+html.dark .output-placeholder {
+  color: #cbd5e1 !important;
+  opacity: 0.85;
 }
 
 .card-toolbar {
@@ -318,6 +372,10 @@
   margin-top: 14px;
   border-top: 1px solid var(--glass-border);
   transition: opacity 0.3s ease;
+}
+
+html.dark .card-toolbar {
+  border-top-color: #334155 !important;
 }
 
 .card-toolbar.toolbar-disabled {
@@ -338,6 +396,10 @@
   margin-right: 6px;
 }
 
+html.dark .char-counter {
+  color: #e2e8f0 !important;
+}
+
 .clear-btn:hover {
   background-color: var(--color-error-container);
   color: var(--color-on-error-container);
@@ -354,6 +416,10 @@
 .icon-btn.listening {
   color: var(--color-error);
   background-color: var(--color-error-container);
+}
+
+html.dark .icon-btn {
+  color: #e2e8f0;
 }
 
 /* --- History Sidebar --- */
