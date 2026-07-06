@@ -18,7 +18,7 @@ Most translation tools are cluttered with ads and require button clicks or page 
 
 - **Frontend**: React 19
 - **Styling**: Vanilla CSS (Custom Design System & Glassmorphism)
-- **APIs**: Web Speech API (Voice/Audio), MyMemory Neural Translation API
+- **APIs**: Web Speech API (Voice/Audio), Google Translate API (`google-translate-api-browser`), MyMemory Neural Translation API (Fallback)
 
 ## Quick Start
 

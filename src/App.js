@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import { translate } from 'google-translate-api-browser';
 import TopNavBar from './components/TopNavBar';
 import HeroSection from './components/HeroSection';
 import LanguageBar, { LANGUAGES } from './components/LanguageBar';
@@ -111,19 +112,36 @@ function App() {
     setTranslatedText('');
 
     try {
-      // Call the live MyMemory Translation API
-      const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(
-        overrideText
-      )}&langpair=${overrideSourceLang}|${overrideTargetLang}`;
-      
-      const response = await fetch(url);
-      const data = await response.json();
-
+      // 1. Primary Engine: Google Translate API (via google-translate-api-browser)
+      // Uses a CORS proxy to enable client-side browser requests to Google's translation endpoint
       let result = '';
-      if (data && data.responseData && data.responseData.translatedText) {
-        result = data.responseData.translatedText;
-      } else {
-        throw new Error('No translation returned');
+      try {
+        const res = await translate(overrideText, {
+          from: overrideSourceLang === 'auto' ? undefined : overrideSourceLang,
+          to: overrideTargetLang,
+          corsUrl: 'https://corsproxy.io/?'
+        });
+        if (res && res.text) {
+          result = res.text;
+        } else {
+          throw new Error('No translation returned from Google Translate API');
+        }
+      } catch (googleErr) {
+        console.warn('Google Translate API failed or CORS blocked, falling back to MyMemory API:', googleErr);
+        
+        // 2. Secondary Fallback: MyMemory Neural Translation API
+        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(
+          overrideText
+        )}&langpair=${overrideSourceLang}|${overrideTargetLang}`;
+        
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data && data.responseData && data.responseData.translatedText) {
+          result = data.responseData.translatedText;
+        } else {
+          throw new Error('No translation returned from fallback API');
+        }
       }
 
       setTranslatedText(result);

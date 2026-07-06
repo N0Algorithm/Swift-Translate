@@ -42,10 +42,11 @@ Here is exactly what happens when a user interacts with the application:
 2. **Triggering Translation (`App.js`)**: 
    - When the user clicks "Translate" OR when they change a language dropdown in `LanguageBar.jsx`, the function `handleTranslate()` is invoked.
    - `setIsTranslating(true)` is called, which immediately renders the animated spinning ring and shimmering skeleton lines inside `TargetCard.jsx`.
-3. **API Communication**:
-   - `handleTranslate()` sends a request to the live **MyMemory Neural Translation API** (`https://api.mymemory.translated.net/get`).
-   - If the API returns a translation, `setTranslatedText(result)` updates the output card.
-   - **Offline Fallback**: If your computer is offline or if API rate limits are exceeded, the app catches the error and intelligently generates a simulated translation so the UI never crashes!
+3. **API Communication (Dual-Engine Architecture)**:
+   - `handleTranslate()` first attempts translation using the **Google Translate API** via `google-translate-api-browser` (using `https://corsproxy.io/?` as a client-side CORS proxy).
+   - **Secondary Fallback**: If Google Translate fails or CORS is blocked, it automatically falls back to the live **MyMemory Neural Translation API** (`https://api.mymemory.translated.net/get`).
+   - If either API returns a translation, `setTranslatedText(result)` updates the output card.
+   - **Intelligent Offline Fallback**: If your computer is offline or if both APIs fail / hit rate limits, the app catches the error and intelligently generates a simulated translation so the UI never crashes!
 4. **Saving History (`localStorage`)**:
    - Every successful translation is automatically added to the `history` array in `App.js`.
    - A React `useEffect` hook monitors the `history` array and saves it directly to `localStorage` (`swift_translate_history`). When you refresh or close the browser, your history is preserved!
