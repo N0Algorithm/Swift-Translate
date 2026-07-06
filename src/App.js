@@ -8,6 +8,7 @@ import TargetCard from './components/TargetCard';
 import HistorySidebar from './components/HistorySidebar';
 import BottomNavBar from './components/BottomNavBar';
 
+// Default demonstration history shown when a user first opens the app
 const INITIAL_HISTORY = [
   {
     id: 'demo-1',
@@ -30,38 +31,42 @@ const INITIAL_HISTORY = [
 ];
 
 function App() {
-  // Theme state: Default to DARK MODE per user request
+  // ==========================================================================
+  // 1. STATE MANAGEMENT
+  // ==========================================================================
+
+  // Theme State: Defaults to Dark Mode per user preference. Saved in localStorage.
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const saved = localStorage.getItem('swift_translate_theme');
     return saved ? saved === 'dark' : true;
   });
 
-  // Translation state
+  // Translation State: Stores the current languages, input text, and AI output.
   const [sourceLang, setSourceLang] = useState('en');
   const [targetLang, setTargetLang] = useState('es');
   const [sourceText, setSourceText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
 
-  // UI Drawer state
+  // UI & Drawer State: Controls whether the history sidebar and toast notifications are visible.
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [activeMobileTab, setActiveMobileTab] = useState('translate');
   const [toastMessage, setToastMessage] = useState(null);
 
-  // History state
+  // History State: Stores recent translations and pinned items. Loaded from localStorage.
   const [history, setHistory] = useState(() => {
     const saved = localStorage.getItem('swift_translate_history');
     if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        return INITIAL_HISTORY;
-      }
+      try { return JSON.parse(saved); } catch (e) { return INITIAL_HISTORY; }
     }
     return INITIAL_HISTORY;
   });
 
-  // Sync dark mode class to html element
+  // ==========================================================================
+  // 2. SIDE EFFECTS (LOCAL STORAGE & THEME SYNC)
+  // ==========================================================================
+
+  // Whenever isDarkMode changes, update the <html class="dark"> tag and save to localStorage
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
@@ -72,12 +77,12 @@ function App() {
     }
   }, [isDarkMode]);
 
-  // Sync history to localStorage
+  // Whenever history changes, save the updated array to localStorage
   useEffect(() => {
     localStorage.setItem('swift_translate_history', JSON.stringify(history));
   }, [history]);
 
-  // Toast auto-hide
+  // Helper function to show a temporary popup message at the bottom of the screen
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => {
@@ -85,7 +90,15 @@ function App() {
     }, 3000);
   };
 
-  // Translation Handler (accepts overrides for immediate translation on dropdown change)
+  // ==========================================================================
+  // 3. CORE TRANSLATION LOGIC
+  // ==========================================================================
+
+  /**
+   * Fetches translation from the MyMemory API.
+   * Accepts optional language and text overrides so we can translate instantly
+   * when the user selects a new dropdown option or clicks the Swap button.
+   */
   const handleTranslate = async (
     overrideSourceLang = sourceLang,
     overrideTargetLang = targetLang,
@@ -97,7 +110,7 @@ function App() {
     setTranslatedText('');
 
     try {
-      // Live MyMemory API call
+      // Call the live MyMemory Translation API
       const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(
         overrideText
       )}&langpair=${overrideSourceLang}|${overrideTargetLang}`;
@@ -114,7 +127,7 @@ function App() {
 
       setTranslatedText(result);
 
-      // Add to history
+      // Add successful translation to the top of the history list (keep max 50 items)
       const newItem = {
         id: `trans-${Date.now()}`,
         sourceLang: overrideSourceLang,
@@ -124,11 +137,13 @@ function App() {
         timestamp: Date.now(),
         isStarred: false
       };
-
       setHistory((prev) => [newItem, ...prev.slice(0, 49)]);
+
     } catch (err) {
       console.warn('API fallback triggered:', err);
-      // Intelligent fallback for offline or rate limits
+      
+      // Intelligent Offline Fallback: If network drops or API rate limit is hit,
+      // simulate translation so the app never crashes or freezes.
       const targetLangName =
         LANGUAGES.find((l) => l.code === overrideTargetLang)?.name || overrideTargetLang;
       
@@ -151,7 +166,11 @@ function App() {
     }
   };
 
-  // Language Dropdown Changes with Instant Translation
+  // ==========================================================================
+  // 4. INSTANT LANGUAGE CHANGERS & SWAP
+  // ==========================================================================
+
+  // When user changes the source language dropdown, update state and translate instantly
   const handleSourceLangChange = (newLang) => {
     setSourceLang(newLang);
     if (sourceText.trim()) {
@@ -159,6 +178,7 @@ function App() {
     }
   };
 
+  // When user changes the target language dropdown, update state and translate instantly
   const handleTargetLangChange = (newLang) => {
     setTargetLang(newLang);
     if (sourceText.trim()) {
@@ -166,7 +186,7 @@ function App() {
     }
   };
 
-  // Language Swap with Instant Translation
+  // Swap source and target languages, flip the text boxes, and translate instantly
   const handleSwapLanguages = () => {
     const newSourceLang = targetLang;
     const newTargetLang = sourceLang;
@@ -184,18 +204,25 @@ function App() {
     }
   };
 
-  // History item actions
+  // ==========================================================================
+  // 5. HISTORY & SAVED PIN HANDLERS
+  // ==========================================================================
+
+  // Load a previously saved translation back into the main workspace
   const handleSelectHistoryItem = (item) => {
     setSourceLang(item.sourceLang);
     setTargetLang(item.targetLang);
     setSourceText(item.sourceText);
     setTranslatedText(item.translatedText);
+    
+    // Close sidebar automatically on mobile/tablets for a cleaner experience
     if (window.innerWidth < 1024) {
       setIsHistoryOpen(false);
       setActiveMobileTab('translate');
     }
   };
 
+  // Toggle the star/pin status of a history item
   const handleToggleStarItem = (id) => {
     setHistory((prev) =>
       prev.map((item) =>
@@ -205,11 +232,13 @@ function App() {
     showToast('Updated Pinned translations');
   };
 
+  // Delete a single item from history
   const handleDeleteItem = (id) => {
     setHistory((prev) => prev.filter((item) => item.id !== id));
     showToast('Removed translation from history');
   };
 
+  // Clear all history after asking for confirmation
   const handleClearAllHistory = () => {
     if (window.confirm('Are you sure you want to clear all translation history?')) {
       setHistory([]);
@@ -217,7 +246,7 @@ function App() {
     }
   };
 
-  // Current translation star check
+  // Check if the currently displayed translation is already starred in history
   const currentHistoryItem = history.find(
     (item) =>
       item.sourceText === sourceText &&
@@ -226,12 +255,12 @@ function App() {
   );
   const isCurrentStarred = currentHistoryItem ? currentHistoryItem.isStarred : false;
 
+  // Star or unstar the translation currently displayed on screen
   const handleToggleCurrentStar = () => {
     if (!translatedText) return;
     if (currentHistoryItem) {
       handleToggleStarItem(currentHistoryItem.id);
     } else {
-      // Save current as starred
       const newItem = {
         id: `trans-${Date.now()}`,
         sourceLang,
@@ -246,9 +275,13 @@ function App() {
     }
   };
 
+  // ==========================================================================
+  // 6. APPLICATION RENDER
+  // ==========================================================================
+
   return (
     <div className="app-container font-body-md">
-      {/* Top Navigation Bar */}
+      {/* Top Navigation Bar (Logo, History Toggle, Theme Switcher) */}
       <TopNavBar
         isDarkMode={isDarkMode}
         onToggleTheme={() => setIsDarkMode((prev) => !prev)}
@@ -256,14 +289,13 @@ function App() {
         onShowToast={showToast}
       />
 
-      {/* Main Workspace Area (No scroll, 1366x768 optimized) */}
+      {/* Main Workspace Area (1366x768 zero-scroll desktop layout) */}
       <main className="main-workspace">
         <div className="center-canvas">
-          {/* Hero Section */}
           <HeroSection />
 
-          {/* Translation Interaction Area */}
           <section className="workspace-section animate-fade-in" style={{ animationDelay: '0.15s' }}>
+            {/* Language Selection Dropdowns & Swap Button */}
             <LanguageBar
               sourceLang={sourceLang}
               targetLang={targetLang}
@@ -272,7 +304,7 @@ function App() {
               onSwap={handleSwapLanguages}
             />
 
-            {/* Input/Output Bento Grid */}
+            {/* Input (Source) and Output (Target) Bento Grid Cards */}
             <div className="bento-grid">
               <SourceCard
                 sourceText={sourceText}
@@ -299,7 +331,7 @@ function App() {
           </section>
         </div>
 
-        {/* Desktop History Sidebar (Smooth transition without unmounting) */}
+        {/* Slide-In History & Pinned Drawer */}
         <HistorySidebar
           isOpen={isHistoryOpen || activeMobileTab === 'history' || activeMobileTab === 'starred'}
           onClose={() => {
@@ -315,14 +347,14 @@ function App() {
         />
       </main>
 
-      {/* Mobile Bottom Navigation Bar */}
+      {/* Mobile-Only Bottom Tab Navigation */}
       <BottomNavBar
         activeTab={activeMobileTab}
         onSelectTab={setActiveMobileTab}
         onToggleHistory={() => setIsHistoryOpen((prev) => !prev)}
       />
 
-      {/* Toast Notification */}
+      {/* Temporary Toast Popup Notification */}
       {toastMessage && (
         <div className="toast-popup">
           <span className="material-symbols-outlined text-[20px] text-primary">info</span>
