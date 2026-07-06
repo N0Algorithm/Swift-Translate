@@ -46,6 +46,12 @@
   --color-outline: #64748b;
   --color-outline-variant: #cbd5e1;
 
+  /* --- Navbar Custom Colors (High Contrast in Light Mode) --- */
+  --navbar-bg: #0f172a;
+  --navbar-text: #ffffff;
+  --navbar-border: #1e293b;
+  --navbar-icon-hover: #1e293b;
+
   /* --- Spacing Scale (Strict 8px Grid) --- */
   --space-xs: 4px;
   --space-sm: 8px;
@@ -104,6 +110,12 @@ html.dark {
   
   --color-outline: #94a3b8;
   --color-outline-variant: #475569;
+
+  /* --- Navbar Dark Mode Colors --- */
+  --navbar-bg: rgba(22, 24, 36, 0.95);
+  --navbar-text: #f8fafc;
+  --navbar-border: rgba(255, 255, 255, 0.16);
+  --navbar-icon-hover: #1e2130;
 
   --glass-bg: rgba(22, 24, 36, 0.9);
   --glass-bg-low: rgba(18, 20, 30, 0.95);
