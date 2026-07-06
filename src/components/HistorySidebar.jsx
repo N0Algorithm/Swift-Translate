@@ -8,8 +8,7 @@ const HistorySidebar = ({
   onSelectHistoryItem,
   onToggleStarItem,
   onDeleteItem,
-  onClearAll,
-  onShowToast
+  onClearAll
 }) => {
   const [activeTab, setActiveTab] = useState('recent'); // 'recent' | 'pinned'
 
@@ -95,7 +94,6 @@ const HistorySidebar = ({
               className="history-item glass-panel-low animate-fade-in"
               onClick={() => {
                 onSelectHistoryItem(item);
-                onShowToast('Loaded translation into workspace');
               }}
             >
               <div className="item-header">
@@ -134,20 +132,14 @@ const HistorySidebar = ({
 
       {/* Footer Links */}
       <div className="sidebar-footer">
-        <button
-          className="footer-link font-body-sm"
-          onClick={() => onShowToast('Help center documentation coming soon!')}
-        >
+        <div className="footer-link font-body-sm" style={{ cursor: 'default' }}>
           <span className="material-symbols-outlined">help</span>
           <span>Help Center</span>
-        </button>
-        <button
-          className="footer-link font-body-sm"
-          onClick={() => onShowToast('Thank you! Please share your feedback.')}
-        >
+        </div>
+        <div className="footer-link font-body-sm" style={{ cursor: 'default' }}>
           <span className="material-symbols-outlined">feedback</span>
           <span>Send Feedback</span>
-        </button>
+        </div>
       </div>
     </aside>
   );

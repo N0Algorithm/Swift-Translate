@@ -6,8 +6,7 @@ const TargetCard = ({
   targetLang,
   isStarred,
   onToggleStar,
-  voiceSpeed = 'Normal',
-  onShowToast
+  voiceSpeed = 'Normal'
 }) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -17,19 +16,15 @@ const TargetCard = ({
     try {
       await navigator.clipboard.writeText(translatedText);
       setCopied(true);
-      onShowToast('Translated text copied to clipboard!');
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      onShowToast('Failed to copy text');
+      console.error('Failed to copy text', err);
     }
   };
 
   const handleSpeak = () => {
     if (!translatedText) return;
-    if (!('speechSynthesis' in window)) {
-      onShowToast('Text-to-speech is not supported in your browser.');
-      return;
-    }
+    if (!('speechSynthesis' in window)) return;
 
     if (isSpeaking) {
       window.speechSynthesis.cancel();
@@ -50,10 +45,7 @@ const TargetCard = ({
 
     utterance.onstart = () => setIsSpeaking(true);
     utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => {
-      setIsSpeaking(false);
-      onShowToast('Error playing audio');
-    };
+    utterance.onerror = () => setIsSpeaking(false);
 
     window.speechSynthesis.speak(utterance);
   };
@@ -71,7 +63,6 @@ const TargetCard = ({
       }
     } else {
       handleCopy();
-      onShowToast('Copied to clipboard for sharing!');
     }
   };
 

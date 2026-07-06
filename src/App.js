@@ -53,10 +53,9 @@ function App() {
   const [translatedText, setTranslatedText] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
 
-  // UI & Drawer State: Controls whether the history sidebar and toast notifications are visible.
+  // UI & Drawer State: Controls whether the history sidebar is visible.
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [activeMobileTab, setActiveMobileTab] = useState('translate');
-  const [toastMessage, setToastMessage] = useState(null);
 
   // History State: Stores recent translations and pinned items. Loaded from localStorage.
   const [history, setHistory] = useState(() => {
@@ -91,14 +90,6 @@ function App() {
   useEffect(() => {
     localStorage.setItem('swift_translate_history', JSON.stringify(history));
   }, [history]);
-
-  // Helper function to show a temporary popup message at the bottom of the screen
-  const showToast = (msg) => {
-    setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage((prev) => (prev === msg ? null : prev));
-    }, 3000);
-  };
 
   // ==========================================================================
   // 3. CORE TRANSLATION LOGIC
@@ -170,7 +161,6 @@ function App() {
         isStarred: false
       };
       setHistory((prev) => [newItem, ...prev.slice(0, 49)]);
-      showToast('Translated (Offline / Fallback Mode)');
     } finally {
       setIsTranslating(false);
     }
@@ -206,8 +196,6 @@ function App() {
     setTargetLang(newTargetLang);
     setSourceText(newSourceText);
     setTranslatedText(sourceText);
-
-    showToast('Swapped languages');
     
     if (newSourceText.trim()) {
       handleTranslate(newSourceLang, newTargetLang, newSourceText);
@@ -239,20 +227,17 @@ function App() {
         item.id === id ? { ...item, isStarred: !item.isStarred } : item
       )
     );
-    showToast('Updated Pinned translations');
   };
 
   // Delete a single item from history
   const handleDeleteItem = (id) => {
     setHistory((prev) => prev.filter((item) => item.id !== id));
-    showToast('Removed translation from history');
   };
 
   // Clear all history after asking for confirmation
   const handleClearAllHistory = () => {
     if (window.confirm('Are you sure you want to clear all translation history?')) {
       setHistory([]);
-      showToast('Cleared all history');
     }
   };
 
@@ -281,7 +266,6 @@ function App() {
         isStarred: true
       };
       setHistory((prev) => [newItem, ...prev]);
-      showToast('Pinned translation');
     }
   };
 
@@ -297,11 +281,7 @@ function App() {
         onToggleTheme={() => setIsDarkMode((prev) => !prev)}
         onToggleHistory={() => setIsHistoryOpen((prev) => !prev)}
         voiceSpeed={voiceSpeed}
-        onSelectVoiceSpeed={(speed) => {
-          setVoiceSpeed(speed);
-          showToast(`Voice speed set to ${speed}`);
-        }}
-        onShowToast={showToast}
+        onSelectVoiceSpeed={(speed) => setVoiceSpeed(speed)}
       />
 
       {/* Main Workspace Area (1366x768 zero-scroll desktop layout) */}
@@ -331,7 +311,6 @@ function App() {
                 }}
                 isTranslating={isTranslating}
                 sourceLang={sourceLang}
-                onShowToast={showToast}
               />
 
               <TargetCard
@@ -341,7 +320,6 @@ function App() {
                 isStarred={isCurrentStarred}
                 onToggleStar={handleToggleCurrentStar}
                 voiceSpeed={voiceSpeed}
-                onShowToast={showToast}
               />
             </div>
           </section>
@@ -359,7 +337,6 @@ function App() {
           onToggleStarItem={handleToggleStarItem}
           onDeleteItem={handleDeleteItem}
           onClearAll={handleClearAllHistory}
-          onShowToast={showToast}
         />
       </main>
 
@@ -369,14 +346,6 @@ function App() {
         onSelectTab={setActiveMobileTab}
         onToggleHistory={() => setIsHistoryOpen((prev) => !prev)}
       />
-
-      {/* Temporary Toast Popup Notification */}
-      {toastMessage && (
-        <div className="toast-popup">
-          <span className="material-symbols-outlined text-[20px] text-primary">info</span>
-          <span>{toastMessage}</span>
-        </div>
-      )}
     </div>
   );
 }

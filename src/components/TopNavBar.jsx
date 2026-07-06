@@ -5,8 +5,7 @@ const TopNavBar = ({
   onToggleTheme,
   onToggleHistory,
   voiceSpeed,
-  onSelectVoiceSpeed,
-  onShowToast
+  onSelectVoiceSpeed
 }) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const logoUrl = '/translate.jpg';

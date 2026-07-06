@@ -21,3 +21,8 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Local explanation guides (Never pushed to GitHub)
+LINE_BY_LINE_EXPLANATION.md
+EXPLANATION_LINE_BY_LINE.md
+DETAILED_EXPLANATION.md

@@ -6,11 +6,11 @@ const SourceCard = ({
   onTranslate,
   onClear,
   isTranslating,
-  sourceLang,
-  onShowToast
+  sourceLang
 }) => {
   const [isListening, setIsListening] = useState(false);
   const [recognition, setRecognition] = useState(null);
+  const [copied, setCopied] = useState(false);
 
   // Initialize Speech Recognition
   useEffect(() => {
@@ -22,7 +22,6 @@ const SourceCard = ({
       
       recog.onstart = () => {
         setIsListening(true);
-        onShowToast('Listening... Speak into your microphone');
       };
 
       recog.onresult = (event) => {
@@ -36,7 +35,6 @@ const SourceCard = ({
       recog.onerror = (event) => {
         console.error('Speech recognition error:', event.error);
         setIsListening(false);
-        onShowToast(`Speech error: ${event.error}`);
       };
 
       recog.onend = () => {
@@ -45,13 +43,10 @@ const SourceCard = ({
 
       setRecognition(recog);
     }
-  }, [sourceText, onSourceTextChange, onShowToast]);
+  }, [sourceText, onSourceTextChange]);
 
   const toggleSpeechRecognition = () => {
-    if (!recognition) {
-      onShowToast('Speech recognition is not supported in this browser.');
-      return;
-    }
+    if (!recognition) return;
 
     if (isListening) {
       recognition.stop();
@@ -65,15 +60,14 @@ const SourceCard = ({
     }
   };
 
-  const handlePaste = async () => {
+  const handleCopySource = async () => {
+    if (!sourceText) return;
     try {
-      const text = await navigator.clipboard.readText();
-      if (text) {
-        onSourceTextChange(sourceText + (sourceText ? ' ' : '') + text);
-        onShowToast('Pasted from clipboard');
-      }
+      await navigator.clipboard.writeText(sourceText);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      onShowToast('Please grant clipboard access to paste text');
+      console.error('Failed to copy text', err);
     }
   };
 
@@ -115,12 +109,15 @@ const SourceCard = ({
           </button>
 
           <button
-            onClick={handlePaste}
-            className="icon-btn"
-            title="Paste from clipboard"
-            aria-label="Paste text"
+            onClick={handleCopySource}
+            disabled={!sourceText}
+            className={`icon-btn ${copied ? 'text-primary' : ''}`}
+            title="Copy source text"
+            aria-label="Copy source text"
           >
-            <span className="material-symbols-outlined">content_paste</span>
+            <span className="material-symbols-outlined">
+              {copied ? 'check' : 'content_copy'}
+            </span>
           </button>
 
           {sourceText.length > 0 && (
