@@ -1,15 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const TopNavBar = ({
   isDarkMode,
   onToggleTheme,
   onToggleHistory,
+  voiceSpeed,
+  onSelectVoiceSpeed,
   onShowToast
 }) => {
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const logoUrl = '/translate.jpg';
-
-  const avatarUrl =
-    'https://lh3.googleusercontent.com/aida-public/AB6AXuDA-17f3oJp2kaMrQv1ci3Ax6mOAlm3xsCQjqR5xQc3ZfyUWQxDyZH-573ufbPscy4_450PqftfCVo_WS7gRI9mxoKjtxD0dQ7PQU9qDtkAaxwUvwdI75j-SRlBZvfBDG4RlgA2--O1NwvzFlhHqY8AmCN3HpJsLLHshZnDtveOscKHsgtA1wfFf_b6BeMhGw_QVdTrQcn2M3Lqd5qfygblO7sduoPtREy5DpSxjxh3cQJTOOo2QKsMH772OYkZeSfyF0Lcwcz_JoU';
 
   return (
     <header className="top-navbar glass-panel">
@@ -27,8 +27,9 @@ const TopNavBar = ({
           <span className="brand-title font-headline-md">Swift Translate</span>
         </div>
 
-        {/* Actions Toolbar */}
+        {/* Actions Toolbar: History -> Theme -> Settings */}
         <div className="navbar-actions">
+          {/* 1. History Button */}
           <button
             className="icon-btn hidden-on-mobile"
             onClick={onToggleHistory}
@@ -38,6 +39,7 @@ const TopNavBar = ({
             <span className="material-symbols-outlined">history</span>
           </button>
 
+          {/* 2. Light/Dark Mode Button */}
           <button
             className="icon-btn"
             onClick={onToggleTheme}
@@ -49,23 +51,63 @@ const TopNavBar = ({
             </span>
           </button>
 
-          <div className="navbar-divider"></div>
+          {/* 3. Settings Button & Side Pop-up Box */}
+          <div style={{ position: 'relative' }}>
+            <button
+              className={`icon-btn ${isSettingsOpen ? 'active' : ''}`}
+              onClick={() => setIsSettingsOpen((prev) => !prev)}
+              title="Settings"
+              aria-label="Toggle Settings"
+            >
+              <span className="material-symbols-outlined">settings</span>
+            </button>
 
-          {/* User Profile Avatar */}
-          <button
-            className="user-avatar-btn"
-            onClick={() => onShowToast('Signed in as Pro User')}
-            title="User Profile"
-          >
-            <img
-              src={avatarUrl}
-              alt="User Avatar"
-              className="user-avatar"
-              onError={(e) => {
-                e.target.src = 'https://ui-avatars.com/api/?name=Pro+User&background=2563eb&color=fff';
-              }}
-            />
-          </button>
+            {/* Side Pop-up Box for Voice Settings */}
+            {isSettingsOpen && (
+              <div className="settings-popup glass-panel animate-fade-in">
+                <div className="settings-header">
+                  <span className="font-label-md uppercase text-primary font-bold">
+                    Voice Settings
+                  </span>
+                  <button
+                    className="icon-btn"
+                    style={{ padding: '2px' }}
+                    onClick={() => setIsSettingsOpen(false)}
+                    title="Close settings"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">close</span>
+                  </button>
+                </div>
+
+                <div className="settings-body">
+                  <label className="font-body-sm font-semibold mb-2 block text-on-surface">
+                    Voice Speed
+                  </label>
+                  <div className="speed-options">
+                    {['Normal', 'Slow', 'Slower'].map((speed) => (
+                      <button
+                        key={speed}
+                        className={`speed-option-btn ${
+                          voiceSpeed === speed ? 'selected' : ''
+                        }`}
+                        onClick={() => {
+                          onSelectVoiceSpeed(speed);
+                          setIsSettingsOpen(false);
+                        }}
+                      >
+                        <span>{speed}</span>
+                        {voiceSpeed === speed && (
+                          <span className="material-symbols-outlined text-[16px]">
+                            check
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>

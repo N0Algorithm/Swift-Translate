@@ -6,6 +6,7 @@ const TargetCard = ({
   targetLang,
   isStarred,
   onToggleStar,
+  voiceSpeed = 'Normal',
   onShowToast
 }) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -38,7 +39,14 @@ const TargetCard = ({
 
     const utterance = new SpeechSynthesisUtterance(translatedText);
     utterance.lang = targetLang;
-    utterance.rate = 0.95;
+
+    // Map voice speed setting to Web Speech API rate
+    const rateMap = {
+      'Normal': 1.0,
+      'Slow': 0.8,
+      'Slower': 0.6
+    };
+    utterance.rate = rateMap[voiceSpeed] || 1.0;
 
     utterance.onstart = () => setIsSpeaking(true);
     utterance.onend = () => setIsSpeaking(false);
@@ -118,7 +126,7 @@ const TargetCard = ({
             onClick={handleSpeak}
             disabled={!hasContent}
             className={`icon-btn ${isSpeaking ? 'active animate-pulse' : ''}`}
-            title={isSpeaking ? 'Stop listening' : 'Listen to translation'}
+            title={`Listen to translation (${voiceSpeed} speed)`}
             aria-label="Listen to translation"
           >
             <span className={`material-symbols-outlined ${isSpeaking ? 'filled' : ''}`}>

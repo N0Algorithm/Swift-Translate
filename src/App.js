@@ -41,6 +41,11 @@ function App() {
     return saved ? saved === 'dark' : true;
   });
 
+  // Voice Speed State: Controls speech pronunciation rate (Normal, Slow, Slower).
+  const [voiceSpeed, setVoiceSpeed] = useState(() => {
+    return localStorage.getItem('swift_translate_voice_speed') || 'Normal';
+  });
+
   // Translation State: Stores the current languages, input text, and translated output.
   const [sourceLang, setSourceLang] = useState('en');
   const [targetLang, setTargetLang] = useState('es');
@@ -76,6 +81,11 @@ function App() {
       localStorage.setItem('swift_translate_theme', 'light');
     }
   }, [isDarkMode]);
+
+  // Whenever voiceSpeed changes, save to localStorage
+  useEffect(() => {
+    localStorage.setItem('swift_translate_voice_speed', voiceSpeed);
+  }, [voiceSpeed]);
 
   // Whenever history changes, save the updated array to localStorage
   useEffect(() => {
@@ -281,11 +291,16 @@ function App() {
 
   return (
     <div className="app-container font-body-md">
-      {/* Top Navigation Bar (Logo, History Toggle, Theme Switcher) */}
+      {/* Top Navigation Bar (Logo, History Toggle, Theme Switcher, Settings Popup) */}
       <TopNavBar
         isDarkMode={isDarkMode}
         onToggleTheme={() => setIsDarkMode((prev) => !prev)}
         onToggleHistory={() => setIsHistoryOpen((prev) => !prev)}
+        voiceSpeed={voiceSpeed}
+        onSelectVoiceSpeed={(speed) => {
+          setVoiceSpeed(speed);
+          showToast(`Voice speed set to ${speed}`);
+        }}
         onShowToast={showToast}
       />
 
@@ -325,6 +340,7 @@ function App() {
                 targetLang={targetLang}
                 isStarred={isCurrentStarred}
                 onToggleStar={handleToggleCurrentStar}
+                voiceSpeed={voiceSpeed}
                 onShowToast={showToast}
               />
             </div>
