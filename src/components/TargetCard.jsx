@@ -59,7 +59,9 @@ const TargetCard = ({
           text: translatedText
         });
       } catch (err) {
-        console.log('Share cancelled or failed:', err);
+        if (err && err.name !== 'AbortError') {
+          console.warn('Share failed:', err);
+        }
       }
     } else {
       handleCopy();
@@ -154,4 +156,4 @@ const TargetCard = ({
   );
 };
 
-export default TargetCard;
+export default React.memo(TargetCard);

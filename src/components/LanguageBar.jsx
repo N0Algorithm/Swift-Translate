@@ -76,4 +76,4 @@ const LanguageBar = ({ sourceLang, targetLang, onSourceChange, onTargetChange, o
   );
 };
 
-export default LanguageBar;
+export default React.memo(LanguageBar);

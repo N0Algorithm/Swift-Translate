@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import './App.css';
 import { translate } from 'google-translate-api-browser';
 import TopNavBar from './components/TopNavBar';
@@ -35,6 +35,9 @@ function App() {
   // ==========================================================================
   // 1. STATE MANAGEMENT
   // ==========================================================================
+
+  // Request Sequence Tracker: Prevents race conditions when switching/swapping languages
+  const requestIdRef = useRef(0);
 
   // Theme State: Defaults to Dark Mode per user preference. Saved in localStorage.
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -97,38 +100,38 @@ function App() {
   // ==========================================================================
 
   /**
-   * Fetches translation from the MyMemory API.
-   * Accepts optional language and text overrides so we can translate instantly
-   * when the user selects a new dropdown option or clicks the Swap button.
+   * Fetches translation using the Google Translate API (via google-translate-api-browser).
+   * Accepts optional language and text overrides for instant translation when dropdowns change.
    */
-  const handleTranslate = async (
+  const handleTranslate = useCallback(async (
     overrideSourceLang = sourceLang,
     overrideTargetLang = targetLang,
     overrideText = sourceText
   ) => {
     if (!overrideText.trim()) return;
 
+    const currentRequestId = ++requestIdRef.current;
     setIsTranslating(true);
     setTranslatedText('');
 
+    let result = '';
     try {
-      // 1. Primary Engine: Google Translate API (via google-translate-api-browser)
-      // Uses a CORS proxy to enable client-side browser requests to Google's translation endpoint
-      let result = '';
+      // 1. Fetch translation directly from Google Translate via CORS proxy
+      const res = await translate(overrideText, {
+        from: overrideSourceLang === 'auto' ? undefined : overrideSourceLang,
+        to: overrideTargetLang,
+        corsUrl: 'https://corsproxy.io/?'
+      });
+
+      if (!res || !res.text) {
+        throw new Error('No translation returned from Google Translate API');
+      }
+
+      result = res.text;
+    } catch (err) {
+      console.warn('Google Translate API via corsproxy failed, trying secondary API:', err);
+      
       try {
-        const res = await translate(overrideText, {
-          from: overrideSourceLang === 'auto' ? undefined : overrideSourceLang,
-          to: overrideTargetLang,
-          corsUrl: 'https://corsproxy.io/?'
-        });
-        if (res && res.text) {
-          result = res.text;
-        } else {
-          throw new Error('No translation returned from Google Translate API');
-        }
-      } catch (googleErr) {
-        console.warn('Google Translate API failed or CORS blocked, falling back to MyMemory API:', googleErr);
-        
         // 2. Secondary Fallback: MyMemory Neural Translation API
         const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(
           overrideText
@@ -142,70 +145,63 @@ function App() {
         } else {
           throw new Error('No translation returned from fallback API');
         }
+      } catch (fallbackErr) {
+        console.warn('All translation APIs failed or offline, using simulated fallback:', fallbackErr);
+        
+        // 3. Intelligent Offline Fallback: If network drops or proxies fail,
+        // simulate translation so the app never crashes or freezes.
+        const targetLangName =
+          LANGUAGES.find((l) => l.code === overrideTargetLang)?.name || overrideTargetLang;
+        
+        result = `[${targetLangName}] ${overrideText}`;
       }
-
-      setTranslatedText(result);
-
-      // Add successful translation to the top of the history list (keep max 50 items)
-      const newItem = {
-        id: `trans-${Date.now()}`,
-        sourceLang: overrideSourceLang,
-        targetLang: overrideTargetLang,
-        sourceText: overrideText,
-        translatedText: result,
-        timestamp: Date.now(),
-        isStarred: false
-      };
-      setHistory((prev) => [newItem, ...prev.slice(0, 49)]);
-
-    } catch (err) {
-      console.warn('API fallback triggered:', err);
-      
-      // Intelligent Offline Fallback: If network drops or API rate limit is hit,
-      // simulate translation so the app never crashes or freezes.
-      const targetLangName =
-        LANGUAGES.find((l) => l.code === overrideTargetLang)?.name || overrideTargetLang;
-      
-      const simulatedResult = `[${targetLangName}] ${overrideText}`;
-      setTranslatedText(simulatedResult);
-
-      const newItem = {
-        id: `trans-${Date.now()}`,
-        sourceLang: overrideSourceLang,
-        targetLang: overrideTargetLang,
-        sourceText: overrideText,
-        translatedText: simulatedResult,
-        timestamp: Date.now(),
-        isStarred: false
-      };
-      setHistory((prev) => [newItem, ...prev.slice(0, 49)]);
     } finally {
-      setIsTranslating(false);
+      if (currentRequestId === requestIdRef.current) {
+        setIsTranslating(false);
+      }
     }
-  };
+
+    // Abort state updates if a newer request has started (prevents race condition mismatches)
+    if (currentRequestId !== requestIdRef.current) return;
+
+    // Update UI output
+    setTranslatedText(result);
+
+    // Add translation to the top of the history list (keep max 50 items)
+    const newItem = {
+      id: `trans-${Date.now()}`,
+      sourceLang: overrideSourceLang,
+      targetLang: overrideTargetLang,
+      sourceText: overrideText,
+      translatedText: result,
+      timestamp: Date.now(),
+      isStarred: false
+    };
+    setHistory((prev) => [newItem, ...prev.slice(0, 49)]);
+  }, [sourceLang, targetLang, sourceText]);
 
   // ==========================================================================
   // 4. INSTANT LANGUAGE CHANGERS & SWAP
   // ==========================================================================
 
   // When user changes the source language dropdown, update state and translate instantly
-  const handleSourceLangChange = (newLang) => {
+  const handleSourceLangChange = useCallback((newLang) => {
     setSourceLang(newLang);
     if (sourceText.trim()) {
       handleTranslate(newLang, targetLang, sourceText);
     }
-  };
+  }, [sourceText, targetLang, handleTranslate]);
 
   // When user changes the target language dropdown, update state and translate instantly
-  const handleTargetLangChange = (newLang) => {
+  const handleTargetLangChange = useCallback((newLang) => {
     setTargetLang(newLang);
     if (sourceText.trim()) {
       handleTranslate(sourceLang, newLang, sourceText);
     }
-  };
+  }, [sourceText, sourceLang, handleTranslate]);
 
   // Swap source and target languages, flip the text boxes, and translate instantly
-  const handleSwapLanguages = () => {
+  const handleSwapLanguages = useCallback(() => {
     const newSourceLang = targetLang;
     const newTargetLang = sourceLang;
     const newSourceText = translatedText || sourceText;
@@ -218,14 +214,14 @@ function App() {
     if (newSourceText.trim()) {
       handleTranslate(newSourceLang, newTargetLang, newSourceText);
     }
-  };
+  }, [targetLang, sourceLang, translatedText, sourceText, handleTranslate]);
 
   // ==========================================================================
   // 5. HISTORY & SAVED PIN HANDLERS
   // ==========================================================================
 
   // Load a previously saved translation back into the main workspace
-  const handleSelectHistoryItem = (item) => {
+  const handleSelectHistoryItem = useCallback((item) => {
     setSourceLang(item.sourceLang);
     setTargetLang(item.targetLang);
     setSourceText(item.sourceText);
@@ -236,40 +232,42 @@ function App() {
       setIsHistoryOpen(false);
       setActiveMobileTab('translate');
     }
-  };
+  }, []);
 
   // Toggle the star/pin status of a history item
-  const handleToggleStarItem = (id) => {
+  const handleToggleStarItem = useCallback((id) => {
     setHistory((prev) =>
       prev.map((item) =>
         item.id === id ? { ...item, isStarred: !item.isStarred } : item
       )
     );
-  };
+  }, []);
 
   // Delete a single item from history
-  const handleDeleteItem = (id) => {
+  const handleDeleteItem = useCallback((id) => {
     setHistory((prev) => prev.filter((item) => item.id !== id));
-  };
+  }, []);
 
   // Clear all history after asking for confirmation
-  const handleClearAllHistory = () => {
+  const handleClearAllHistory = useCallback(() => {
     if (window.confirm('Are you sure you want to clear all translation history?')) {
       setHistory([]);
     }
-  };
+  }, []);
 
   // Check if the currently displayed translation is already starred in history
-  const currentHistoryItem = history.find(
-    (item) =>
-      item.sourceText === sourceText &&
-      item.translatedText === translatedText &&
-      translatedText !== ''
-  );
+  const currentHistoryItem = useMemo(() => {
+    return history.find(
+      (item) =>
+        item.sourceText === sourceText &&
+        item.translatedText === translatedText &&
+        translatedText !== ''
+    );
+  }, [history, sourceText, translatedText]);
   const isCurrentStarred = currentHistoryItem ? currentHistoryItem.isStarred : false;
 
   // Star or unstar the translation currently displayed on screen
-  const handleToggleCurrentStar = () => {
+  const handleToggleCurrentStar = useCallback(() => {
     if (!translatedText) return;
     if (currentHistoryItem) {
       handleToggleStarItem(currentHistoryItem.id);
@@ -285,7 +283,7 @@ function App() {
       };
       setHistory((prev) => [newItem, ...prev]);
     }
-  };
+  }, [translatedText, currentHistoryItem, handleToggleStarItem, sourceLang, targetLang, sourceText]);
 
   // ==========================================================================
   // 6. APPLICATION RENDER
