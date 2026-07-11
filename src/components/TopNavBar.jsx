@@ -113,4 +113,5 @@ const TopNavBar = ({
   );
 };
 
-export default React.memo(TopNavBar);
+const MemoizedTopNavBar = React.memo(TopNavBar);
+export default MemoizedTopNavBar;

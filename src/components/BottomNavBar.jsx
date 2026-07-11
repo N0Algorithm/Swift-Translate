@@ -45,4 +45,5 @@ const BottomNavBar = ({
   );
 };
 
-export default React.memo(BottomNavBar);
+const MemoizedBottomNavBar = React.memo(BottomNavBar);
+export default MemoizedBottomNavBar;

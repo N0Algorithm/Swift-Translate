@@ -11,4 +11,5 @@ const HeroSection = () => {
   );
 };
 
-export default React.memo(HeroSection);
+const MemoizedHeroSection = React.memo(HeroSection);
+export default MemoizedHeroSection;

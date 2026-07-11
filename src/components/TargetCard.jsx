@@ -156,4 +156,5 @@ const TargetCard = ({
   );
 };
 
-export default React.memo(TargetCard);
+const MemoizedTargetCard = React.memo(TargetCard);
+export default MemoizedTargetCard;
