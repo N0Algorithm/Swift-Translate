@@ -196,9 +196,13 @@ function App() {
         
         try {
           // 3. Tertiary Fallback: MyMemory Neural Translation API
+          const sourcePair = overrideSourceLang === 'auto'
+            ? (overrideTargetLang === 'en' ? 'es' : 'en')
+            : overrideSourceLang;
+
           const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(
             overrideText
-          )}&langpair=${overrideSourceLang}|${overrideTargetLang}`;
+          )}&langpair=${sourcePair}|${overrideTargetLang}`;
           
           const response = await fetch(url);
           const data = await response.json();
