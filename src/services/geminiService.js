@@ -1,6 +1,6 @@
 /**
- * Service to handle high-fidelity deterministic translation via the Google Gemini API.
- */
+* Service to handle high-fidelity deterministic translation via the Google Gemini API.
+*/
 
 // Supported language name mappings to improve translation precision in the LLM prompt.
 export const LANGUAGE_NAMES = {
@@ -34,13 +34,13 @@ async function fetchWithRetry(url, options, retries = 3, delay = 1000) {
       if (response.ok) {
         return response;
       }
-      
+
       // If it is a bad request or key issue (400-403) and not a rate limit (429), fail immediately to avoid waiting
       if (response.status >= 400 && response.status < 500 && response.status !== 429) {
         const errorText = await response.text();
         throw new Error(`Gemini API client error (HTTP ${response.status}): ${errorText}`);
       }
-      
+
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     } catch (error) {
       if (i === retries - 1) throw error;
@@ -107,13 +107,13 @@ CRITICAL CONSTRAINTS:
     responseSchema = {
       type: 'OBJECT',
       properties: {
-        detectedLanguage: { 
-          type: 'STRING', 
+        detectedLanguage: {
+          type: 'STRING',
           description: "The ISO 639-1 / BCP-47 language code of the detected language (e.g. 'en', 'es', 'fr', 'zh-CN', etc.)."
         },
-        translatedText: { 
-          type: 'STRING', 
-          description: "The literal and faithful translation of the input text." 
+        translatedText: {
+          type: 'STRING',
+          description: "The literal and faithful translation of the input text."
         }
       },
       required: ['detectedLanguage', 'translatedText']
@@ -136,9 +136,9 @@ CRITICAL CONSTRAINTS:
     responseSchema = {
       type: 'OBJECT',
       properties: {
-        translatedText: { 
-          type: 'STRING', 
-          description: "The literal and faithful translation of the input text." 
+        translatedText: {
+          type: 'STRING',
+          description: "The literal and faithful translation of the input text."
         }
       },
       required: ['translatedText']
@@ -192,7 +192,7 @@ CRITICAL CONSTRAINTS:
   }
 
   let rawResponseText = responseData.candidates[0].content.parts[0].text;
-  
+
   // Clean markdown block wraps if the model added them despite constraints
   rawResponseText = rawResponseText
     .replace(/^```json\s*/i, '')
