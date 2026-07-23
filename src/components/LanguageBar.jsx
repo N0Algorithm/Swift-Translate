@@ -18,7 +18,14 @@ export const LANGUAGES = [
   { code: 'vi', name: 'Vietnamese' }
 ];
 
-const LanguageBar = ({ sourceLang, targetLang, onSourceChange, onTargetChange, onSwap }) => {
+const LanguageBar = ({
+  sourceLang,
+  targetLang,
+  onSourceChange,
+  onTargetChange,
+  onSwap,
+  detectedLang
+}) => {
   const [isSwapping, setIsSwapping] = useState(false);
 
   const handleSwapClick = () => {
@@ -26,6 +33,8 @@ const LanguageBar = ({ sourceLang, targetLang, onSourceChange, onTargetChange, o
     onSwap();
     setTimeout(() => setIsSwapping(false), 300);
   };
+
+  const sourceLanguages = [{ code: 'auto', name: 'Detect Language' }, ...LANGUAGES];
 
   return (
     <div className="language-bar glass-panel-low">
@@ -37,11 +46,19 @@ const LanguageBar = ({ sourceLang, targetLang, onSourceChange, onTargetChange, o
           className="lang-select source-select font-label-md"
           aria-label="Select source language"
         >
-          {LANGUAGES.map((lang) => (
-            <option key={`src-${lang.code}`} value={lang.code}>
-              {lang.name}
-            </option>
-          ))}
+          {sourceLanguages.map((lang) => {
+            const isAuto = lang.code === 'auto';
+            let name = lang.name;
+            if (isAuto && sourceLang === 'auto' && detectedLang) {
+              const detectedName = LANGUAGES.find((l) => l.code === detectedLang)?.name || detectedLang;
+              name = `Detect Language (${detectedName})`;
+            }
+            return (
+              <option key={`src-${lang.code}`} value={lang.code}>
+                {name}
+              </option>
+            );
+          })}
         </select>
         <span className="material-symbols-outlined select-icon">expand_more</span>
       </div>

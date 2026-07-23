@@ -474,6 +474,16 @@ html.dark .icon-btn {
   color: #e2e8f0;
 }
 
+html.dark .icon-btn.active {
+  color: #ffffff;
+  background-color: var(--color-primary-container);
+}
+
+html.dark .icon-btn.listening {
+  color: #ffffff;
+  background-color: var(--color-error);
+}
+
 /* --- History Sidebar --- */
 .history-sidebar {
   position: fixed;
@@ -880,3 +890,77 @@ html.dark .icon-btn {
     width: 100%;
   }
 }
+
+/* ==========================================================================
+   SETTINGS API KEY CONFIGURATION & STYLING
+   ========================================================================== */
+.settings-input-group {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--glass-border);
+}
+
+html.dark .settings-input-group {
+  border-top-color: #334155 !important;
+}
+
+.settings-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.settings-input {
+  width: 100%;
+  padding: 8px 36px 8px 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border);
+  background-color: var(--color-surface-container);
+  color: var(--color-on-surface);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+html.dark .settings-input {
+  background-color: #0f111a !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+.settings-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.15);
+}
+
+.settings-input-icon-btn {
+  position: absolute;
+  right: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-outline);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.settings-input-icon-btn:hover {
+  background-color: rgba(var(--color-on-surface-rgb), 0.08);
+  color: var(--color-primary);
+}
+
+html.dark .settings-input-icon-btn:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.settings-help-text {
+  font-size: 11px;
+  color: var(--color-outline);
+  margin-top: 5px;
+  line-height: 1.4;
+}
+

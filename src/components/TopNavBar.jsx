@@ -5,9 +5,12 @@ const TopNavBar = ({
   onToggleTheme,
   onToggleHistory,
   voiceSpeed,
-  onSelectVoiceSpeed
+  onSelectVoiceSpeed,
+  geminiApiKey,
+  onChangeGeminiApiKey
 }) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [showKey, setShowKey] = useState(false);
   const logoUrl = '/translate.jpg';
 
   return (
@@ -66,7 +69,7 @@ const TopNavBar = ({
               <div className="settings-popup glass-panel animate-fade-in">
                 <div className="settings-header">
                   <span className="font-label-md uppercase text-primary font-bold">
-                    Voice Settings
+                    Settings
                   </span>
                   <button
                     className="icon-btn"
@@ -102,6 +105,37 @@ const TopNavBar = ({
                         )}
                       </button>
                     ))}
+                  </div>
+
+                  {/* Gemini API Key Configuration Section */}
+                  <div className="settings-input-group">
+                    <label className="font-body-sm font-semibold mb-2 block text-on-surface">
+                      Gemini API Key
+                    </label>
+                    <div className="settings-input-wrapper">
+                      <input
+                        type={showKey ? 'text' : 'password'}
+                        value={geminiApiKey}
+                        onChange={(e) => onChangeGeminiApiKey(e.target.value)}
+                        placeholder="Enter API Key..."
+                        className="settings-input font-body-sm"
+                        title="Your API key is stored locally in your browser."
+                      />
+                      <button
+                        type="button"
+                        className="settings-input-icon-btn"
+                        onClick={() => setShowKey((prev) => !prev)}
+                        title={showKey ? 'Hide key' : 'Show key'}
+                        aria-label={showKey ? 'Hide Gemini API Key' : 'Show Gemini API Key'}
+                      >
+                        <span className="material-symbols-outlined text-[18px]">
+                          {showKey ? 'visibility_off' : 'visibility'}
+                        </span>
+                      </button>
+                    </div>
+                    <p className="settings-help-text">
+                      Required for high-fidelity LLM translation. Falls back to proxy scraper if blank.
+                    </p>
                   </div>
                 </div>
               </div>
