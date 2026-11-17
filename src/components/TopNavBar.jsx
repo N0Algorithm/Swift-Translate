@@ -29,9 +29,7 @@ const TopNavBar = ({
           <span className="brand-title font-headline-md">Swift Translate</span>
         </div>
 
-        {/* Actions Toolbar: History -> Theme -> Settings */}
         <div className="navbar-actions">
-          {/* 1. History Button */}
           <button
             className="icon-btn hidden-on-mobile"
             onClick={onToggleHistory}
@@ -41,7 +39,6 @@ const TopNavBar = ({
             <span className="material-symbols-outlined">history</span>
           </button>
 
-          {/* 2. Light/Dark Mode Button */}
           <button
             className="icon-btn"
             onClick={onToggleTheme}
@@ -53,7 +50,6 @@ const TopNavBar = ({
             </span>
           </button>
 
-          {/* 3. Settings Button & Side Pop-up Box */}
           <div style={{ position: 'relative' }}>
             <button
               className={`icon-btn ${isSettingsOpen ? 'active' : ''}`}
@@ -107,7 +103,7 @@ const TopNavBar = ({
                     ))}
                   </div>
 
-                  {/* Gemini API Key Configuration Section */}
+                  {/* Gemini API Key */}
                   <div className="settings-input-group">
                     <label className="font-body-sm font-semibold mb-2 block text-on-surface">
                       Gemini API Key
@@ -134,7 +130,7 @@ const TopNavBar = ({
                       </button>
                     </div>
                     <p className="settings-help-text">
-                      Required for high-fidelity LLM translation. Falls back to proxy scraper if blank.
+                      Optional: uses Gemini for translation if provided, otherwise uses default translation engines.
                     </p>
                   </div>
                 </div>

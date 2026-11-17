@@ -74,7 +74,6 @@ const TargetCard = ({
     <div className="bento-card target-card glass-panel">
       <div className="card-content">
         {isTranslating ? (
-          /* Dynamic Loading Animation in Target Text-Area */
           <div className="translation-loading animate-fade-in">
             <div className="loading-spinner-row">
               <div className="spinner-ring"></div>
@@ -88,12 +87,10 @@ const TargetCard = ({
             </div>
           </div>
         ) : translatedText ? (
-          /* Translated Content */
           <div className="output-content font-headline-md animate-fade-in">
             {translatedText}
           </div>
         ) : (
-          /* Empty State Placeholder */
           <div className="output-placeholder font-headline-md">
             Translation appears here...
           </div>

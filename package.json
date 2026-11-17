@@ -1,61 +1,21 @@
 {
   "name": "swifttranslate",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
   "dependencies": {
-    "@testing-library/dom": "^10.4.1",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.2",
-    "@testing-library/user-event": "^13.5.0",
     "google-translate-api-browser": "^5.0.0",
     "react": "^19.2.7",
-    "react-dom": "^19.2.7",
-    "react-scripts": "5.0.1"
+    "react-dom": "^19.2.7"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "overrides": {
-    "nth-check": "^2.1.1",
-    "underscore": "^1.13.7",
-    "serialize-javascript": "^7.0.5",
-    "webpack-dev-server": "^5.2.6",
-    "postcss": "^8.5.6",
-    "flatted": "^3.3.3",
-    "shell-quote": "^1.8.2",
-    "brace-expansion": "^2.0.1",
-    "fast-uri": "^3.1.5",
-    "js-yaml": "^4.1.0",
-    "body-parser": "^1.20.6",
-    "@tootallnate/once": "^2.0.1",
-    "svgo": "^3.3.2",
-    "uuid": "^11.1.1",
-    "rollup-plugin-terser": {
-      "serialize-javascript": "^7.0.5"
-    },
-    "css-minimizer-webpack-plugin": {
-      "serialize-javascript": "^7.0.5"
-    }
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.2.0"
   }
 }
